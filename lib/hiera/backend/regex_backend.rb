@@ -12,8 +12,8 @@ class Hiera
          answer = nil
          datasourcefiles(scope) do |source|
            scope_key = File.basename(source, ".regex")
-           scope_key = "::#{scope_key}" if ! scope.has_key?(scope_key)
-           if ! scope.has_key?(scope_key)
+           scope_key = "::#{scope_key}" if ! scope[scope_key]
+           if ! scope[scope_key]
              Hiera.debug("Could not find key #{scope_key} within scope, skipping check for source #{source}")
              next
            end
