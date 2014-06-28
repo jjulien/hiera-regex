@@ -44,24 +44,17 @@ postfix::smtp_relay: 'mailin-trusted.example.org'
 
 Now let's walkthrough a few scenarios
 
-`$::fqdn == 'mailout-dmz1.example.org'`:
+`$::fqdn == 'mailout-dmz1.example.org'`: smtp.mailgun.org
 
-**Result:** smtp.mailgun.org
+`$::fqdn == 'mailout-dmz2.example.org'`: smtp.mailgun.org
 
-`$::fqdn == 'mailout-dmz2.example.org'`:
-*Result:* smtp.mailgun.org
+`$::fqdn == 'mailin-dmz1.example.org'`: localhost
 
-`$::fqdn == 'mailin-dmz1.example.org'`:
-*Result:* localhost
+`$::fqdn == 'mailin-dmz2.example.org'`: localhost
 
-`$::fqdn == 'mailin-dmz2.example.org'`:
-*Result:* localhost
+`$::fqdn == 'mailin-trusted.example.org'`: mailout-dmz.example.org
 
-`$::fqdn == 'mailin-trusted.example.org'`:
-*Result:* mailout-dmz.example.org
-
-`$::fqdn == 'someserver.example.org'`:
-*Result:* mailin-trusted.example.org
+`$::fqdn == 'someserver.example.org'`: mailin-trusted.example.org
 
 
 The time savings of using the regex backend is not having to create seperate YAML files for each mail(out|in)-dmz[1-2] server.  Adding a new outbound DMZ mail server requires no changes to the hiera data, and if the outbound mail relay needs to change from smtp.mailgun.org to smtp.gmail.com the change only needs to be made in once place.
