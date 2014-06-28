@@ -1,7 +1,7 @@
-===Hiera Regex===
+# Hiera Regex
 Hiera Regex matches client facts against a regex string to provide hierarchical data.  A typical use case would be matching against a hostname pattern rather than using the standard file backend where each FQDN would require it's own file.
 
-===How it works===
+## How it works
 Hiera regex works very similar to the standard file backend with hiera with the exception of the filename used to lookup data.  The last key in a hierarchy is used as the filename with the .regex extension for lookups.  So if you wanted to do a regex on the `::fqdn` fact, your filename would be fqdn.regex.
 
 The contents of the .regex file will be an array of hashes.  The purpose of the array is to provide an order in which you want the fqdn regex to be evaluated.  Each array element contains a hash which has a key that is the regex to be tested against the fqdn fact.  The value of the hash is a hash which contains the hiera key/value pairs that can be requested.
@@ -42,9 +42,11 @@ postfix::smtp_relay: 'mailout-dmz.example.org'
 postfix::smtp_relay: 'mailin-trusted.example.org'
 ```
 
-Now let's assume a few scenarios
+Now let's walkthrough a few scenarios
+
 `$::fqdn == 'mailout-dmz1.example.org'`:
-*Result:* smtp.mailgun.org
+
+**Result:** smtp.mailgun.org
 
 `$::fqdn == 'mailout-dmz2.example.org'`:
 *Result:* smtp.mailgun.org
