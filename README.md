@@ -40,6 +40,7 @@ postfix::smtp_relay: 'mailin-trusted.example.org'
 ```
 
 Now let's walk through a few values for `::fqdn`
+
 `$::fqdn == 'mailout-dmz1.example.org'`: *Result:* smtp.mailgun.org
 
 `$::fqdn == 'mailout-dmz1.example.org'`: smtp.mailgun.org
@@ -71,7 +72,7 @@ Having multiple hiera lookup keys in your regex file would look like this:
 ```
 
 ##Gotchas
-When intermingeling the regex and yaml backends your hierarchies will sometimes step on each other if you don't pay close attention to some of the nuiances between the two.
+When intermingling the regex and yaml backends your hierarchies will sometimes step on each other if you don't pay close attention to some of the nuances between the two.
 
 How you setup your key/value pairs depends on if you want the yaml backend to be before or after the regex backend in the hierarchy.
 
@@ -106,7 +107,7 @@ With the yaml backend this would normally be achieved by creating a file `fqdn/m
 
 So to summarize, you can continue to use fact.yaml files as long as you don't use the regex backend for that particular fact.  If you do use the regex for a fact, your default values in common.yaml will still work, assuming you don't match on `/.*/`.
 
-##Example 2 - Regex backend after yaml backend in hierarchy (Has limitiations)
+###Example 2 - Regex backend after yaml backend in hierarchy (Has limitiations)
 The common gotcha with this approach is having key/value pair in common.yaml which causes your regex backend to never get evaluted.  You can still have default values, they just need to be the last matching key of the regex backend.
 /var/lib/hiera/fqnd/fqdn.regex:
 ```
