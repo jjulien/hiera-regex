@@ -25,24 +25,22 @@ Let's walk through an example using the hierarchy and files below
 /var/lib/hiera/fqdn/fqdn.regex:
 ```
 ---
+ - '^mailin-trusted.example.org$':
+     postfix::smtp_relay: 'mailout-dmz.example.org'
  - '^mailout.*':
      postfix::smtp_relay: 'smtp.mailgun.org'
  - '^mailin.*':
      postfix::smtp_relay: 'localhost'
 ```
 
-/var/lib/hiera/fqdn/mainout-trusted.example.org.yaml:
-```
----
-postfix::smtp_relay: 'mailout-dmz.example.org'
-```
-
 /var/lib/hiera/common.yaml:
 ```
+---
 postfix::smtp_relay: 'mailin-trusted.example.org'
 ```
 
-Now let's walkthrough a few scenarios
+Now let's walk through a few values for `::fqdn`
+`$::fqdn == 'mailout-dmz1.example.org'`: *Result:* smtp.mailgun.org
 
 `$::fqdn == 'mailout-dmz1.example.org'`: smtp.mailgun.org
 
@@ -59,8 +57,6 @@ Now let's walkthrough a few scenarios
 
 The time savings of using the regex backend is not having to create seperate YAML files for each mail(out|in)-dmz[1-2] server.  Adding a new outbound DMZ mail server requires no changes to the hiera data, and if the outbound mail relay needs to change from smtp.mailgun.org to smtp.gmail.com the change only needs to be made in once place.
 
-It is important to note that the regex backend has to come BEFORE the yaml backend in your hierarchy.  If it does not, then in the above example all of the DMZ servers would have ended up evaluating to the common.yaml by fallthru and no regex attempts would be made.
-
 Having multiple hiera lookup keys in your regex file would look like this:
 
 /var/lib/hiera/fqdn/fqdn.regex:
@@ -73,3 +69,63 @@ Having multiple hiera lookup keys in your regex file would look like this:
      postfix::smtp_relay: 'localhost'
      postfix::mynetworks: '10.0.0.0/8,127.0.0.1'
 ```
+
+===Gotchas===
+When intermingeling the regex and yaml backends your hierarchies will sometimes step on each other if you don't pay close attention to some of the nuiances between the two.
+
+How you setup your key/value pairs depends on if you want the yaml backend to be before or after the regex backend in the hierarchy.
+
+The recommended method would be to have the regex backend first and the yaml backend second.  This is because there are some limitations to default fallthru values (i.e. common.yaml) when putting the yaml backend first.  Those are discussed in more detail in the second example.
+
+==Example 1 - Regex backend first in the hierarchy (Recommended)==
+/etc/puppet/hiera.conf
+```
+:backends:
+  - regex
+  - yaml
+:yaml:
+  :datadir: /var/lib/hiera
+:regex:
+  :datadir: /var/lib/hiera
+:hierarchy:
+  - "fqdn/%{::fqdn}"
+  - common
+```
+The common gotcha with this configuration is continuing to rely on the fqdn.yaml files when fqdn might match a regex. In the how-to example you saw that the fqdn `mailin-trusted.example.org` had a directly match value for the key `postfix::smtp_relay`.  Here's the regex file so you don't have to scroll back up.
+/var/lib/hiera/fqdn/fqdn.regex:
+```
+---
+ - '^mailin-trusted.example.org$':
+     postfix::smtp_relay: 'mailout-dmz.example.org'
+ - '^mailout.*':
+     postfix::smtp_relay: 'smtp.mailgun.org'
+ - '^mailin.*':
+     postfix::smtp_relay: 'localhost'
+```
+With the yaml backend this would normally be achieved by creating a file `fqdn/mailin-trusted.example.org.yaml`.  If the direct matched regex were not in the fqdn.regex file and you were relying on the yaml backend to find the value in `fqdn/mailin-trusted.example.org.yaml`, this would never be evaluated because the fqdn `mailin-trusted.example.org` matches the regex `^mailin.*'.  So the value would have been `localhost` instead of `mailout-dmz.example.org`.
+
+So to summarize, you can continue to use fact.yaml files as long as you don't use the regex backend for that particular fact.  If you do use the regex for a fact, your default values in common.yaml will still work, assuming you don't match on `/.*/`.
+
+==Example 2 - Regex backend after yaml backend in hierarchy (Has limitiations)==
+The common gotcha with this approach is having key/value pair in common.yaml which causes your regex backend to never get evaluted.  You can still have default values, they just need to be the last matching key of the regex backend.
+/var/lib/hiera/fqnd/fqdn.regex:
+```
+---
+ - '^mailout.*':
+     postfix::smtp_relay: 'smtp.mailgun.org'
+ - '^mailin.*':
+     postfix::smtp_relay: 'localhost'
+ - '.*':
+     postfix::smtp_relay: 'mailin-trusted.example.org'
+```
+Here the default value for no matching yaml backend files and no matching regex keys is `mailin-trusted.example.org` since `.*` matches anything.
+
+There is a limitation to this approach.  Your default will sometimes get matched even when there is still a regex yet to be evaluated lower in the hierarchy.  For example, if your hierarchy was:
+```
+:hierarchy
+ - fqdn/%{::fqdn}
+ - network/%{::network_eth0}
+ - common
+```
+and your network_eth0 fact were to match a regex, it would never get evaluated if you used the /.*/ default match in fqdn, since it is first in the hierarchy. This is why example 1 which puts the regex before the yaml backend is the recommended implementation.
+
