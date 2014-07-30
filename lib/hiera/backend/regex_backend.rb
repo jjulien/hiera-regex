@@ -1,10 +1,13 @@
+require 'hiera/filecache'
+
 class Hiera
   module Backend
     class Regex_backend
 
       # TODO: Support JSON or YAML format and initialize accordingly
-      def initialize
+      def initialize(cache=nil)
          require 'yaml'
+         @cache = cache || Filecache.new
       end
 
       # TODO: Support multiple resolution_types, currently only supports :priority
@@ -18,8 +21,10 @@ class Hiera
              next
            end
            Hiera.debug("Checking #{source} for #{scope_key} regex matching #{scope[scope_key]}")
+
            # TODO: Add support for more than just YAML format
-           data = YAML.load_file(source)
+           data = YAML.load(@cache.read(source))
+
            next if ! data
            next if data.empty?
 
