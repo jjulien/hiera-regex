@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name         = "hiera-regex"
-  gem.version      = "0.2.0"
+  gem.version      = "0.2.1"
   gem.description  = "Hiera backend for looking up keys using the power of regular expressions"
   gem.summary      = "Hiera regex backend"
   gem.author       = "John Julien"
