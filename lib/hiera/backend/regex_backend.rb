@@ -34,7 +34,7 @@ class Hiera
              item.each_key do |regex_key|
                if scope[scope_key] =~ /#{regex_key}/ and item[regex_key][key]
                  Hiera.debug("#{scope_key} with value of '#{scope[scope_key]}' matched regex /#{regex_key}/ at #{source}:#{lineno}")
-                 answer = item[regex_key][key]
+                 answer = Backend.parse_string(item[regex_key][key], scope)
                  break
                end
              end
