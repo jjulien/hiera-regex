@@ -34,11 +34,22 @@ class Hiera
              item.each_key do |regex_key|
                if scope[scope_key] =~ /#{regex_key}/ and item[regex_key][key]
                  Hiera.debug("#{scope_key} with value of '#{scope[scope_key]}' matched regex /#{regex_key}/ at #{source}:#{lineno}")
-                 answer = Backend.parse_string(item[regex_key][key], scope)
-                 break
+                 new_answer = Backend.parse_answer(item[regex_key][key], scope)
+                 case resolution_type
+                 when :array
+                   raise Exception, "Hiera type mismatch for key '#{key}': expected Array and got #{new_answer.class}" unless new_answer.kind_of? Array or new_answer.kind_of? String
+                   answer ||= []
+                   answer << new_answer
+                 when :hash
+                   raise Exception, "Hiera type mismatch for key '#{key}': expected Hash and got #{new_answer.class}" unless new_answer.kind_of? Hash
+                   answer ||= {}
+                   answer = Backend.merge_answer(new_answer,answer)
+                 else
+                   answer = new_answer
+                   return answer
+                 end
                end
              end
-             break if answer
            end
          end
          return answer
@@ -67,7 +78,6 @@ class Hiera
            end
          end
        end
-
     end
   end
-end   
+end
