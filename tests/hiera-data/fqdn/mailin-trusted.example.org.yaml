@@ -1,0 +1,4 @@
+---
+postfix::smtp_relay: 'mailout-dmz.example.org'
+postfix::array: ['just-mailin-yaml_Backend', 'second-mailin-yaml_backend']
+postfix::hash: {'just-mailin': 'yaml_backend'}

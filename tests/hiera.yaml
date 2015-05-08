@@ -1,0 +1,14 @@
+---
+:backends:
+  - regex
+  - yaml
+  - json
+:yaml:
+  :datadir: tests/hiera-data
+:json:
+  :datadir: tests/hiera-data
+:regex:
+  :datadir: tests/hiera-data
+:hierarchy:
+  - "fqdn/%{::fqdn}"
+  - common

@@ -1,0 +1,16 @@
+---
+ - '^mailin-trusted.example.org$':
+     postfix::smtp_relay: 'mailout-dmz.example.org'
+     postfix::array: ['just-mailin-trusted', 'second-just-mailin-trusted']
+     postfix::hash: {'mailin-trusted.example.org': 'regex_backend'}
+ - '^mailout.*':
+     postfix::smtp_relay: 'smtp.mailgun.org'
+     postfix::trusted_networks:
+      network1: '10.0.0.0/8'
+      network2: '172.16.0.0/16'
+ - '^mailin.*':
+     postfix::smtp_relay: 'localhost'
+     postfix::array: ['all-mailin']
+     postfix::hash: {'mailin.*': 'regex_backend', 'malin.*key2': 'regex_backend'}
+ - '.*':
+     postfix::array: ['everyone']

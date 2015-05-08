@@ -1,0 +1,5 @@
+---
+postfix::smtp_relay: 'mailin-trusted.example.org'
+getit: "%{::somefact} and %{::somefact2} andotherstuff"
+postfix::array: 'everyone-yamlbackend'
+postfix::hash: {'everyone': 'yamlbackend'}
