@@ -1,5 +1,5 @@
 # Hiera Regex
-Hiera Regex matches client facts against a regex string to provide hierarchical data.  A typical use case would be matching against a hostname pattern rather than using the standard file backend where each FQDN would require it's own file.
+Hiera Regex is a data backend for hiera that matches client facts against a regex string.  A typical use case would be matching against a hostname pattern rather than using the standard file backend where each FQDN would require it's own file.
 
 ## How it works
 Hiera regex works very similar to the standard file backend with hiera with the exception of the filename used to lookup data.  The last key in a hierarchy is used as the filename with the .regex extension for lookups.  So if you wanted to do a regex on the `::fqdn` fact, your filename would be fqdn.regex.
