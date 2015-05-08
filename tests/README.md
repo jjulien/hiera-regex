@@ -1,7 +1,7 @@
 ## Testing
 This directory is used to store test data, configs, and scopres for use during development.
 
-To execute a test lookup, from the root of the project directory run the `hiera`, an optional test scope, and the key you want to look up.
+To execute a test lookup; from the root of the project directory run the `hiera` command passing in the test config, an optional test scope, and the key you want to look up.
 
 **Example**
 ```
