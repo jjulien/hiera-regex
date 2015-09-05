@@ -32,7 +32,7 @@ class Hiera
            data.each do |item|
              lineno = lineno + 1
              item.each_key do |regex_key|
-               if scope[scope_key] =~ /#{regex_key}/ and item[regex_key][key]
+               if scope[scope_key] =~ /#{regex_key}/ and item[regex_key].has_key?(key)
                  Hiera.debug("#{scope_key} with value of '#{scope[scope_key]}' matched regex /#{regex_key}/ at #{source}:#{lineno}")
                  new_answer = Backend.parse_answer(item[regex_key][key], scope)
                  case resolution_type
