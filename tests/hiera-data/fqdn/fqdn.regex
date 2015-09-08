@@ -8,6 +8,7 @@
      postfix::trusted_networks:
       network1: '10.0.0.0/8'
       network2: '172.16.0.0/16'
+     postfix::spamassassin: false
  - '^mailin.*':
      postfix::smtp_relay: 'localhost'
      postfix::array: ['all-mailin']
